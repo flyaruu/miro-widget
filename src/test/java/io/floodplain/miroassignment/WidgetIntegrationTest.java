@@ -1,5 +1,6 @@
 package io.floodplain.miroassignment;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -17,6 +18,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
+import java.io.UnsupportedEncodingException;
 import java.time.Instant;
 import java.util.List;
 
@@ -37,6 +39,7 @@ public class WidgetIntegrationTest {
     @Autowired
     private ObjectMapper objectMapper;
 
+
     @Test
     public void testWidgetCRUD() throws Exception {
 
@@ -46,7 +49,7 @@ public class WidgetIntegrationTest {
 
 
         // Add a widget
-        Widget w = new Widget(1,2,3,4,5, Instant.ofEpochSecond(1000000));
+        Widget w = new Widget(1,2,3,4, Instant.ofEpochSecond(1000000));
         MvcResult insertResult = mockMvc.perform(post("/widget")
                 .contentType("application/json")
                 .content(objectMapper.writeValueAsString(w)))

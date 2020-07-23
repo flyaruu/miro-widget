@@ -47,4 +47,11 @@ public class TestRateLimiter {
         Assertions.assertFalse(last.success());
     }
 
+    // Rate limiter is now limited to 1 minute span, so actually unit testing in 'live' time is unpractical.
+    // Either we'd need to implement more granular time control for the bucket system, or add the ability to
+    // move time forward for the buckets. Out of scope for this exercise.
+    @Test
+    public void testActualRateLimiting() {
+
+    }
 }

@@ -4,7 +4,7 @@ import java.time.Duration;
 import java.time.Instant;
 
 /**
- * Note: IntelliJ complains here, should be fixed in the next update
+ * Note: IntelliJ complains here, known bug,  should be fixed in the next update
  * @param success success, true if we are allowed to proceed
  * @param rateLimit the number of requests we can do in a minute
  * @param available the remaining request count for this minute

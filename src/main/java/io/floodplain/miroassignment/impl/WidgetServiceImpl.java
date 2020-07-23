@@ -16,18 +16,26 @@ public class WidgetServiceImpl implements WidgetService {
     // I can't extend records though, so I'll end up copy/pasting most properties. Also not nice.
     @Override
     public String insertWidget(Widget w) {
+        return insertWidget(w,0);
+    }
+
+    @Override
+    public String insertWidget(Widget w, int index) {
         String id = UUID.randomUUID().toString();
-        storeWidget(id,w);
+        storeWidget(id,w,index);
         return id;
     }
 
-    private synchronized void storeWidget(String id, Widget w) {
+    private synchronized void storeWidget(String id, Widget w, int index) {
         widgets.put(id,w);
-        insertZIndex(w);
+        insertZIndex(w,index);
     }
 
-    private synchronized void deleteWidget(String id, Widget w) {
+    private synchronized boolean deleteWidget(String id, Widget w) {
+        boolean found = widgets.containsKey(id);
         widgets.remove(id);
+        zWidgetIndex.remove(w);
+        return found;
 //        zWidgetIndex.remove(w.z());
     }
 
@@ -42,9 +50,10 @@ public class WidgetServiceImpl implements WidgetService {
      *
      * @param w
      */
-    private void insertZIndex(Widget w) {
-        zWidgetIndex.add(0,w);
+    private void insertZIndex(Widget w, int index) {
+        zWidgetIndex.add(index,w);
     }
+
 
     @Override
     public Widget getWidget(String id) {
@@ -57,16 +66,21 @@ public class WidgetServiceImpl implements WidgetService {
     }
 
     @Override
-    public void deleteWidget(String id) {
+    public boolean deleteWidget(String id) {
         Widget w = getWidget(id);
-        deleteWidget(id,w);
-
+        return deleteWidget(id,w);
     }
 
     @Override
-    public void updateWidget(String id, Widget widget) {
-        deleteWidget(id,widget);
-        storeWidget(id,widget);
+    public boolean updateWidget(String id, Widget widget) {
+        Widget previousWidget = getWidget(id);
+        if(previousWidget==null) {
+            return false;
+        }
+        int previousIndex = zWidgetIndex.indexOf(previousWidget);
+        deleteWidget(id,previousWidget);
+        storeWidget(id,widget, previousIndex);
+        return true;
     }
 
     @Override
@@ -76,8 +90,7 @@ public class WidgetServiceImpl implements WidgetService {
 
     @Override
     public List<Widget> listPaginated(int from, int count) {
-        return null;
+        List<Widget> widgets = listWidgets();
+        return widgets.subList(from, Math.min(from+count,widgets.size()));
     }
-
-
 }
