@@ -23,7 +23,7 @@ public class WidgetController {
     }
 
     // TODO using param for pagination
-    @GetMapping("/widgetz")
+    @GetMapping("/widget")
     public ResponseEntity<List<Widget>> getWidgetzz(@RequestParam(required = false) Integer from, @RequestParam(required = false, defaultValue = "500") int count) {
         // Require 5 tokens, making listing 5x more expensive than regular calls.
         // Potentially subjective interpretation of the spec
@@ -40,13 +40,16 @@ public class WidgetController {
     }
 
     // TODO using param for pagination
-    @GetMapping("/widget")
-    public List<Widget> getWidgets(@RequestParam(required = false) Integer from, @RequestParam(required = false, defaultValue = "500") int count) {
-        // Require 5 tokens, making listing 5x more expensive than regular calls.
-        // Potentially subjective interpretation of the spec
-        RateLimitResponse rateLimitResponse = rateLimiter.request(LIST_WIDGET_MODIFIER);
-        return service.listWidgets();
-    }
+//    @GetMapping("/widget")
+//    public List<Widget> getWidgets(@RequestParam(required = false) Integer from, @RequestParam(required = false, defaultValue = "500") int count) {
+//        // Require 5 tokens, making listing 5x more expensive than regular calls.
+//        // Potentially subjective interpretation of the spec
+//        RateLimitResponse rateLimitResponse = rateLimiter.request(LIST_WIDGET_MODIFIER);
+//        if(!rateLimitResponse.success()) {
+//            return new ResponseEntity(HttpStatus.TOO_MANY_REQUESTS);
+//        }
+//        return service.listWidgets();
+//    }
 
     @PostMapping("/widget")
     public ResponseEntity<String> insertWidget(@RequestBody Widget widget) {

@@ -21,6 +21,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import java.io.UnsupportedEncodingException;
 import java.time.Instant;
 import java.util.List;
+import java.util.stream.IntStream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -81,6 +82,16 @@ public class WidgetIntegrationTest {
 //                .content(objectMapper.writeValueAsString(w)))
 //                .andExpect(status().isOk());
 
+    }
+
+    @Test
+    public void testActualRateLimiting() throws Exception {
+        for (int i=0; i < 200; i++) {
+            logger.info("Attempt # {}",i);
+            mockMvc.perform(get("/widget"))
+                    .andExpect(status().isOk());
+//                listWidgets();
+        }
     }
 
     private List<Widget> listWidgets() throws Exception {
