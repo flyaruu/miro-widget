@@ -89,6 +89,11 @@ public class WidgetController {
         return service.getWidget(id);
     }
 
+    /**
+     * Convert the rateLimitResponse object from the ratelimiter to HTTP Headers
+     * @param rateLimitReponse
+     * @return
+     */
     private HttpHeaders parseRateLimitHeaders(RateLimitResponse rateLimitReponse) {
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.put("RateLimit-Remaining",List.of(Long.toString(rateLimitReponse.rateLimit())));
