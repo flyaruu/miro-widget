@@ -6,6 +6,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import io.floodplain.miroassignment.impl.RateLimitImplementation;
 import io.floodplain.miroassignment.impl.WidgetServiceImpl;
+import io.floodplain.miroassignment.model.RateLimitResponse;
+import io.floodplain.miroassignment.model.RateLimiter;
 import io.floodplain.miroassignment.model.Widget;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -14,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -40,6 +43,8 @@ public class WidgetIntegrationTest {
     @Autowired
     private ObjectMapper objectMapper;
 
+    @Autowired
+    private RateLimiter rateLimiter;
 
     @Test
     public void testWidgetCRUD() throws Exception {
@@ -86,12 +91,16 @@ public class WidgetIntegrationTest {
 
     @Test
     public void testActualRateLimiting() throws Exception {
-        for (int i=0; i < 200; i++) {
-            logger.info("Attempt # {}",i);
+        // start with 10 tokens, good for two lists.
+        rateLimiter.setMaxRequestsPerMinute(10);
+        for (int i=0; i < 2; i++) {
             mockMvc.perform(get("/widget"))
                     .andExpect(status().isOk());
-//                listWidgets();
         }
+        // next one should fail
+        mockMvc.perform(get("/widget"))
+                .andExpect(status().is(HttpStatus.TOO_MANY_REQUESTS.value()));
+
     }
 
     private List<Widget> listWidgets() throws Exception {

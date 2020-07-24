@@ -24,7 +24,7 @@ public class WidgetController {
 
     // TODO using param for pagination
     @GetMapping("/widget")
-    public ResponseEntity<List<Widget>> getWidgetzz(@RequestParam(required = false) Integer from, @RequestParam(required = false, defaultValue = "500") int count) {
+    public ResponseEntity<List<Widget>> getWidget(@RequestParam(required = false) Integer from, @RequestParam(required = false, defaultValue = "500") int count) {
         // Require 5 tokens, making listing 5x more expensive than regular calls.
         // Potentially subjective interpretation of the spec
         RateLimitResponse rateLimitResponse = rateLimiter.request(LIST_WIDGET_MODIFIER);
