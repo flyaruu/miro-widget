@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController("widgetController")
 public class WidgetController {
@@ -24,7 +25,7 @@ public class WidgetController {
 
     // TODO using param for pagination
     @GetMapping("/widget")
-    public ResponseEntity<List<Widget>> getWidget(@RequestParam(required = false) Integer from, @RequestParam(required = false, defaultValue = "500") int count) {
+    public ResponseEntity<List<Widget>> getWidget(@RequestParam(required = false) Integer from, @RequestParam(required = false) Integer count) {
         // Require 5 tokens, making listing 5x more expensive than regular calls.
         // Potentially subjective interpretation of the spec
         RateLimitResponse rateLimitResponse = rateLimiter.request(LIST_WIDGET_MODIFIER);
@@ -34,7 +35,7 @@ public class WidgetController {
 
         // 'From' is nullable, if present paginate, otherwise don't
         if(from!=null) {
-            return ResponseEntity.ok(service.listPaginated(from,count));
+            return ResponseEntity.ok(service.listPaginated(from, Optional.ofNullable(count)));
         }
         return ResponseEntity.ok(service.listWidgets());
     }
@@ -52,16 +53,16 @@ public class WidgetController {
 //    }
 
     @PostMapping("/widget")
-    public ResponseEntity<String> insertWidget(@RequestBody Widget widget) {
+    public ResponseEntity<Widget> insertWidget(@RequestBody Widget widget) {
         // TODO Any restrictions on widgets? Things like negative height / width? Weird time stamps?
         RateLimitResponse rateLimitResponse = rateLimiter.request(1);
         if(!rateLimitResponse.success()) {
             return new ResponseEntity(HttpStatus.TOO_MANY_REQUESTS);
         }
-        String id = service.insertWidget(widget);
+        Widget insertedWidget = service.insertWidget(widget);
         return ResponseEntity.status(HttpStatus.OK)
                 .headers(parseRateLimitHeaders(rateLimitResponse))
-                .body(id);
+                .body(insertedWidget);
     }
 
     @DeleteMapping("/widget/{id}")

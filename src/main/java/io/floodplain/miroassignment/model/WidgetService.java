@@ -1,22 +1,33 @@
 package io.floodplain.miroassignment.model;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface WidgetService {
+
+    /**
+     * Max page size
+     */
+    public static final int MAX_PAGINATION_COUNT = 500;
+    /**
+     * Default page size
+     */
+    public static final int DEFAULT_PAGINATION_COUNT = 10;
+
     /**
      * Inserts widgets with z coordinate at the level 0.
      * @param w Widget to insert
      * @return Created key
      */
-    String insertWidget(Widget w);
+    Widget insertWidget(Widget w);
 
     /**
      * Inserts widgets with z coordinate at the required level.
-     * @param w Widget to insert
+     * @param w Widget to insert (with a null id)
      * @param index
-     * @return Created key
+     * @return An inserted widget. With a generated key
      */
-    String insertWidget(Widget w, int index);
+    Widget insertWidget(Widget w, int index);
 
     /**
      * Find a widget and return it
@@ -53,8 +64,11 @@ public interface WidgetService {
     /**
      * List widgets within the
      * @param from start index
-     * @param count number of
-     * @return
+     * @param count optionally number of elements. If empty, default number of widgets will be returned (maxed by MAX_PAGINATION_COUNT)
+     * @return the selected list
      */
-    List<Widget> listPaginated(int from, int count);
+    List<Widget> listPaginated(int from, Optional<Integer> count);
+
+    List<Widget> listFiltered(int x, int y, int width, int height);
+
 }

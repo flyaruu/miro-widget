@@ -24,6 +24,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import java.io.UnsupportedEncodingException;
 import java.time.Instant;
 import java.util.List;
+import java.util.Random;
 import java.util.stream.IntStream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -52,16 +53,16 @@ public class WidgetIntegrationTest {
         // List widgets, should be zero
         assertEquals (0, listWidgets().size());
 
-
-
         // Add a widget
-        Widget w = new Widget(1,2,3,4, Instant.ofEpochSecond(1000000));
+        Widget w = TestingUtilities.createRandomWidget();
         MvcResult insertResult = mockMvc.perform(post("/widget")
                 .contentType("application/json")
                 .content(objectMapper.writeValueAsString(w)))
                 .andExpect(status().isOk())
                 .andReturn();
-        String id = insertResult.getResponse().getContentAsString();
+        Widget insertedWidget = objectMapper.readValue(insertResult.getResponse().getContentAsByteArray(),Widget.class);
+
+        String id = insertedWidget.id();
         logger.info("Detected id: {}",id);
 
         // Query widget again, should be identical to original
@@ -70,7 +71,7 @@ public class WidgetIntegrationTest {
                 .andExpect(status().isOk())
                 .andReturn();
         Widget reQueried = objectMapper.readValue(queryResult.getResponse().getContentAsByteArray(),Widget.class);
-        assertEquals(w,reQueried);
+        assertEquals(insertedWidget,reQueried);
 
         // List widgets, should contain one widget now
         assertEquals (1, listWidgets().size());
@@ -81,32 +82,43 @@ public class WidgetIntegrationTest {
         // deleted, should be empty again
         assertEquals (0, listWidgets().size());
 
-//        mockMvc.perform(post("/widget/{id}", 42L)
-//                .contentType("application/json")
-////                .param("sendWelcomeMail", "true")
-//                .content(objectMapper.writeValueAsString(w)))
-//                .andExpect(status().isOk());
-
     }
 
     @Test
     public void testActualRateLimiting() throws Exception {
-        // start with 10 tokens, good for two lists.
+        // start with 10 tokens, good for two lists, (every list query uses up 5 tokens)
         rateLimiter.setMaxRequestsPerMinute(10);
         for (int i=0; i < 2; i++) {
             mockMvc.perform(get("/widget"))
                     .andExpect(status().isOk());
         }
         // next one should fail
-        mockMvc.perform(get("/widget"))
-                .andExpect(status().is(HttpStatus.TOO_MANY_REQUESTS.value()));
+        var result = mockMvc.perform(get("/widget"))
+                .andExpect(status().is(HttpStatus.TOO_MANY_REQUESTS.value()))
+                .andReturn();
 
     }
 
+    // TODO test pagination
+    public void testPagination() {
+
+    }
+
+    // TODO test geo index
+    public void testGeoIndex() {
+
+    }
+
+
+    // Test utility function
     private List<Widget> listWidgets() throws Exception {
         byte[] listResponse = mockMvc.perform(get("/widget"))
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsByteArray();
         return objectMapper.readValue(listResponse, new TypeReference<List<Widget>>(){});
     }
+
+//    private boolean widgetAttributesEqual(Widget first, Widget second) {
+//
+//    }
 }
