@@ -19,4 +19,8 @@ public class TestingUtilities {
                 Instant.ofEpochSecond(random.nextInt(10000000))
         );
     }
+
+    static Widget createTestWidget(int number) {
+        return new Widget(null,number,number,number,number,number,Instant.ofEpochSecond(number));
+    }
 }

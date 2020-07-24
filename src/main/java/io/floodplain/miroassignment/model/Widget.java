@@ -8,7 +8,7 @@ public record Widget(
         @JsonProperty("id") String id,
         @JsonProperty("x") int x,
         @JsonProperty("y") int y,
-        @JsonProperty("z") Integer z, // nullable?
+        @JsonProperty("z") int z,
         @JsonProperty("width") int width,
         @JsonProperty("height") int height,
         @JsonProperty("lastModified") Instant lastModified) {
@@ -35,12 +35,12 @@ public record Widget(
         );
     }
 
-    public static Widget create(int x, int y, int width, int height) {
-        return new Widget(null,x,y,null,width,height, Instant.ofEpochSecond(0));
+    public static Widget create(int x, int y, int z, int width, int height) {
+        return new Widget(null,x,y,z,width,height, Instant.ofEpochSecond(0));
     }
 
-    public static Widget create(int x, int y, int width, int height, Instant lastModified) {
-        return new Widget(null,x,y,null,width,height, lastModified);
+    public static Widget create(int x, int y, int z, int width, int height, Instant lastModified) {
+        return new Widget(null,x,y,z,width,height, lastModified);
     }
 
 }

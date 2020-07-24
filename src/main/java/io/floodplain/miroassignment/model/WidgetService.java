@@ -1,5 +1,6 @@
 package io.floodplain.miroassignment.model;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -22,14 +23,6 @@ public interface WidgetService {
     Widget insertWidget(Widget w);
 
     /**
-     * Inserts widgets with z coordinate at the required level.
-     * @param w Widget to insert (with a null id)
-     * @param index
-     * @return An inserted widget. With a generated key
-     */
-    Widget insertWidget(Widget w, int index);
-
-    /**
      * Find a widget and return it
      * @param id the id
      * @return widget, or null if not found
@@ -45,11 +38,10 @@ public interface WidgetService {
 
     /**
      * Replace a widget with the supplied widget
-     * @param id id to replace
-     * @param widget new widget
-     * @return true if found, false otherwise
+     * @param widget new widget. The widget should have an id pointing to an existing widget
+     * @return the new updated widget.
      */
-    boolean updateWidget(String id, Widget widget);
+    Widget updateWidget(Widget widget);
 
     /**
      * Remove all widgets

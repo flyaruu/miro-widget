@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -25,7 +26,7 @@ public class WidgetController {
 
     // TODO using param for pagination
     @GetMapping("/widget")
-    public ResponseEntity<List<Widget>> getWidget(@RequestParam(required = false) Integer from, @RequestParam(required = false) Integer count) {
+    public ResponseEntity<Collection<Widget>> getWidget(@RequestParam(required = false) Integer from, @RequestParam(required = false) Integer count) {
         // Require 5 tokens, making listing 5x more expensive than regular calls.
         // Potentially subjective interpretation of the spec
         RateLimitResponse rateLimitResponse = rateLimiter.request(LIST_WIDGET_MODIFIER);
@@ -79,7 +80,7 @@ public class WidgetController {
 
     @PutMapping("/widget/{id}")
     public void updateWidget(@PathVariable String id, @RequestBody Widget widget) {
-        service.updateWidget(id,widget);
+        service.updateWidget(widget);
     }
 
     @GetMapping("/widget/{id}")

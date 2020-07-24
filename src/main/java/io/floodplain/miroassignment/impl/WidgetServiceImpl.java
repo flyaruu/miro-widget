@@ -1,12 +1,12 @@
 package io.floodplain.miroassignment.impl;
 
-import com.github.davidmoten.rtree2.Entry;
 import com.github.davidmoten.rtree2.RTree;
 import com.github.davidmoten.rtree2.geometry.Geometries;
 import com.github.davidmoten.rtree2.geometry.Rectangle;
 import io.floodplain.miroassignment.model.Widget;
 import io.floodplain.miroassignment.model.WidgetService;
 import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
@@ -18,36 +18,29 @@ import java.util.stream.StreamSupport;
 public class WidgetServiceImpl implements WidgetService {
 
     private final Map<String,Widget> widgets = new HashMap<>();
-    private final LinkedList<Widget> zWidgetIndex = new LinkedList<>();
-
+    private final TreeSet<Widget> zWidgetIndex = new TreeSet<>(Comparator.comparing(Widget::z));
     private final AtomicReference<RTree<Widget, Rectangle>> geoIndex = new AtomicReference<>(RTree.create());
 
     // (thought) debating whether to create a separate type for this request (basically a widget without id)
     // I can't extend records though, so I'll end up copy/pasting most properties. Also not nice.
     @Override
     public Widget insertWidget(Widget w) {
-        return insertWidget(w,0);
-    }
-
-    @Override
-    public Widget insertWidget(Widget w, int index) {
         String id = UUID.randomUUID().toString();
         Widget withId = w.withId(id);
-        storeWidget(id,withId,index);
+        storeWidget(withId);
         return withId;
     }
 
-    private synchronized void storeWidget(String id, Widget w, int index) {
-        widgets.put(id,w);
+    private synchronized void storeWidget(Widget w) {
+        pushWidgetToSet(w);
         // TODO geoIndex uses doubles. Test for rounding errors
-        insertZIndex(w,index);
         geoIndex.updateAndGet(rtree->rtree.add(w, Geometries.rectangle(w.x(),w.y(),w.x()+w.width(),w.y() + w.height())));
        ;
     }
 
-    private synchronized boolean deleteWidget(String id, Widget w) {
-        boolean found = widgets.containsKey(id);
-        widgets.remove(id);
+    private synchronized boolean deleteWidget(Widget w) {
+        boolean found = widgets.containsKey(w.id());
+        widgets.remove(w.id());
         zWidgetIndex.remove(w);
         geoIndex.updateAndGet(rtree->rtree.delete(w, Geometries.rectangle(w.x(),w.y(),w.x()+w.width(),w.y()+w.height())));
         return found;
@@ -64,18 +57,25 @@ public class WidgetServiceImpl implements WidgetService {
      * Will insert the widget into the z-index linked list, might end up moving up others if they are in the way.
      * (thought) Possibly expensive. Could create bigger gaps so shifting the list is less frequent.
      *
-     * @param w
+     * @param s
      */
-    private void insertZIndex(Widget w, int index) {
-        zWidgetIndex.add(index,w);
-    }
 
+    private void pushWidgetToSet(Widget s) {
+        boolean inserted = zWidgetIndex.add(s);
+        this.widgets.put(s.id(),s);
+        if(inserted) {
+            return;
+        }
+        Widget removed = zWidgetIndex.tailSet(s,true).pollFirst();
+        boolean success = zWidgetIndex.add(s); // should always work, as we just removed the offending item
+        // now continue to find a spot for the item that was in the way, starting at z+1
+        pushWidgetToSet(removed.withZIndex(removed.z()+1));
+    }
 
     @Override
     public Widget getWidget(String id) {
         return widgets.get(id);
     }
-
     @Override
     public void clear() {
         clearAllWidgets();
@@ -83,36 +83,36 @@ public class WidgetServiceImpl implements WidgetService {
 
     @Override
     public boolean deleteWidget(String id) {
+        Assert.notNull(id,"deleteWidget should have a non-null id");
         Widget w = getWidget(id);
-        return deleteWidget(id,w);
+        Assert.notNull(id,"deleteWidget can not delete a non-existing id");
+        return deleteWidget(w);
     }
 
     @Override
-    public boolean updateWidget(String id, Widget widget) {
-        Widget previousWidget = getWidget(id);
-        if(previousWidget==null) {
-            return false;
-        }
-        int previousIndex = zWidgetIndex.indexOf(previousWidget);
-        deleteWidget(id,previousWidget);
-        storeWidget(id,widget, previousIndex);
-        return true;
+    public Widget updateWidget(Widget widget) {
+        Widget previousWidget = getWidget(widget.id());
+        Assert.notNull(previousWidget,"updateWidget can not update a non-existing id");
+        deleteWidget(previousWidget);
+        storeWidget(widget);
+        return widget;
     }
 
     @Override
     public List<Widget> listWidgets() {
-        return Collections.unmodifiableList(this.zWidgetIndex);
+        return Collections.unmodifiableList(new ArrayList<>(zWidgetIndex));
     }
 
     @Override
     public List<Widget> listPaginated(int from, Optional<Integer> count) {
 
         // No more than MAX_PAGINATION_COUNT, DEFAULT_PAGINATION_COUNT if unspecified
+        // Chose to cap at MAX_PAGINATION_COUNT, instead of error
         int effectiveCount = count
                 .map(cnt->Math.min(cnt, MAX_PAGINATION_COUNT))
                 .orElse(DEFAULT_PAGINATION_COUNT);
 
-        List<Widget> widgets = listWidgets();
+        Collection<Widget> widgets = listWidgets();
         return widgets.stream()
                 .skip(from)
                 .limit(effectiveCount)

@@ -52,7 +52,7 @@ public class TestWidgetService {
         assertEquals(insertedWidget, retrieved);
         // Test update. Update to new widget, retrieve and see if it stuck:
         Widget otherWidget = TestingUtilities.createRandomWidget();
-        widgetService.updateWidget(insertedWidget.id(), otherWidget);
+        widgetService.updateWidget(otherWidget.withId(insertedWidget.id()));
         // And still should be only one
         assertEquals(1, widgetService.listWidgets().size());
         // Test delete and see that is empty now
@@ -63,17 +63,21 @@ public class TestWidgetService {
 
     @Test
     public void testZIndex() {
-        Widget firstWidget = widgetService.insertWidget(TestingUtilities.createRandomWidget());
-        // Inserting without index, so using index 0:
-        Widget secondWidget = widgetService.insertWidget(TestingUtilities.createRandomWidget());
+        Widget firstWidget = widgetService.insertWidget(TestingUtilities.createTestWidget(1).withZIndex(10));
+        Widget secondWidget = widgetService.insertWidget(TestingUtilities.createTestWidget(2).withZIndex(11));
         // Verify ordering:
         List<Widget> list = widgetService.listWidgets();
-        // Assert if they are the expected widget (without the id, as that was generated)
-        assertEquals(secondWidget, list.get(0));
-        assertEquals(firstWidget, list.get(1));
-        // Now add at the end:
-        Widget thirdWidget = widgetService.insertWidget(TestingUtilities.createRandomWidget(), 2);
-        assertEquals(thirdWidget, list.get(2));
+        assertEquals(firstWidget, list.get(0));
+        assertEquals(secondWidget, list.get(1));
+        // assert unchanged z:
+        assertEquals(10,firstWidget.z());
+        assertEquals(11,secondWidget.z());
+
+        Widget thirdWidget = widgetService.insertWidget(TestingUtilities.createTestWidget(3).withZIndex(10));
+        // add another at z=10. First should be at eleven now, second at twelve
+        assertEquals(10,thirdWidget.z());
+        assertEquals(11,widgetService.getWidget(firstWidget.id()).z());
+        assertEquals(12,widgetService.getWidget(secondWidget.id()).z());
     }
 
     @Test
