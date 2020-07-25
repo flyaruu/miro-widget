@@ -8,10 +8,16 @@ I think test coverage is ok though.
 
 I did most of the optionals, except the SQL based back end. I got pretty far using jOOQ (also a thing I never used but wanted to try), but ran out of time.
 
+It was unclear to me if the last_updated flag needed to be updated by the backend. I've left it untouched for now.
+
+### CI
+The build test runs here: 
+
+[![CircleCI](https://circleci.com/gh/flyaruu/miro-widget.svg?style=svg)](https://circleci.com/gh/circleci/circleci-docs)
+
 
 ### Dependencies
 I used bucket4j for the rate limiter. I used a rtree2 from David Moten for the geo queries.
-
 I don't really like the fact that the rate limiting is intermixed so much with the actual application code, but there isn't much I can do about that. As an architecture, I'd prefer to move rate limiting to somewhere in the ingress pipeline.
 
 ### Building & Running
