@@ -2,7 +2,6 @@ package io.floodplain.miroassignment;
 
 import io.floodplain.miroassignment.model.RateLimitResponse;
 import io.floodplain.miroassignment.model.RateLimiter;
-import org.apache.tomcat.util.http.fileupload.MultipartStream;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;

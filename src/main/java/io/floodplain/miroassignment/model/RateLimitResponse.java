@@ -1,7 +1,6 @@
 package io.floodplain.miroassignment.model;
 
 import java.time.Duration;
-import java.time.Instant;
 
 /**
  * Note: IntelliJ complains here, known bug,  should be fixed in the next update

@@ -36,9 +36,13 @@ public class WidgetController {
 
         // 'From' is nullable, if present paginate, otherwise don't
         if(from!=null) {
-            return ResponseEntity.ok(service.listPaginated(from, Optional.ofNullable(count)));
+            return ResponseEntity.ok()
+                    .headers(parseRateLimitHeaders(rateLimitResponse))
+                    .body(service.listPaginated(from, Optional.ofNullable(count)));
         }
-        return ResponseEntity.ok(service.listWidgets());
+        return ResponseEntity.ok()
+                .headers(parseRateLimitHeaders(rateLimitResponse))
+            .body(service.listWidgets());
     }
 
     // TODO using param for pagination

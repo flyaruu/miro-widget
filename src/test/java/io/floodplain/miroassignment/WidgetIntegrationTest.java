@@ -1,15 +1,11 @@
 package io.floodplain.miroassignment;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
 import io.floodplain.miroassignment.impl.RateLimitImplementation;
 import io.floodplain.miroassignment.impl.WidgetServiceImpl;
-import io.floodplain.miroassignment.model.RateLimitResponse;
 import io.floodplain.miroassignment.model.RateLimiter;
 import io.floodplain.miroassignment.model.Widget;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,15 +17,11 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
-import java.io.UnsupportedEncodingException;
-import java.time.Instant;
 import java.util.List;
-import java.util.Random;
-import java.util.stream.IntStream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest
 @AutoConfigureMockMvc
