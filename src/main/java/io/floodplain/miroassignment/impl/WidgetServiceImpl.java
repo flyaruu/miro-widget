@@ -1,5 +1,6 @@
 package io.floodplain.miroassignment.impl;
 
+import com.github.davidmoten.rtree2.Entry;
 import com.github.davidmoten.rtree2.RTree;
 import com.github.davidmoten.rtree2.geometry.Geometries;
 import com.github.davidmoten.rtree2.geometry.Rectangle;
@@ -33,7 +34,6 @@ public class WidgetServiceImpl implements WidgetService {
         pushWidgetToSet(w);
         // TODO geoIndex uses doubles. Tested for rounding errors, no issues found
         geoIndex.updateAndGet(rtree -> rtree.add(w, Geometries.rectangle(w.x(), w.y(), w.x() + w.width(), w.y() + w.height())));
-        ;
     }
 
     private synchronized boolean deleteWidget(Widget w) {
@@ -54,23 +54,28 @@ public class WidgetServiceImpl implements WidgetService {
     /**
      * Will insert the widget into the z-index linked list, might end up moving up others if they are in the way.
      * Recusive, but tail recursive so I expect no performance issues for large sets.
-     * @param s
+     * @param s the widget to add
      */
 
     private void pushWidgetToSet(Widget s) {
+
         boolean inserted = zWidgetIndex.add(s);
         this.widgets.put(s.id(), s);
         if (inserted) {
             return;
         }
         Widget removed = zWidgetIndex.tailSet(s, true).pollFirst();
+        Assert.notNull(removed,"should not happen.");
+
         boolean success = zWidgetIndex.add(s); // should always work, as we just removed the offending item
+        Assert.isTrue(success,"bug. should not happen");
         // now continue to find a spot for the item that was in the way, starting at z+1
         pushWidgetToSet(removed.withZIndex(removed.z() + 1));
     }
 
     @Override
     public Widget getWidget(String id) {
+        Assert.notNull(id, "get should have a non-null id");
         return widgets.get(id);
     }
 
@@ -89,6 +94,7 @@ public class WidgetServiceImpl implements WidgetService {
 
     @Override
     public Widget updateWidget(Widget widget) {
+        Assert.notNull(widget, "updateWidget can not update a null widget");
         Widget previousWidget = getWidget(widget.id());
         Assert.notNull(previousWidget, "updateWidget can not update a non-existing id");
         deleteWidget(previousWidget);
@@ -98,7 +104,7 @@ public class WidgetServiceImpl implements WidgetService {
 
     @Override
     public List<Widget> listWidgets() {
-        return Collections.unmodifiableList(new ArrayList<>(zWidgetIndex));
+        return List.copyOf(zWidgetIndex);
     }
 
     @Override
@@ -121,7 +127,7 @@ public class WidgetServiceImpl implements WidgetService {
     public List<Widget> listFiltered(int x, int y, int width, int height) {
         return StreamSupport
                 .stream(geoIndex.get().search(Geometries.rectangle(x, y, x + width, y + height)).spliterator(), false)
-                .map(entry -> entry.value())
+                .map(Entry::value)
                 // need to post-filter, as the rtree will also include partial matches
                 .filter(fallsWithinBounds(x, y, width, height))
                 .collect(Collectors.toList());
@@ -129,11 +135,11 @@ public class WidgetServiceImpl implements WidgetService {
 
     /**
      * The rtree implementation tests for rectangles that touch, not that completely fall within the rectangle
-     * @param x
-     * @param y
-     * @param width
-     * @param height
-     * @return
+     * @param x x of query box
+     * @param y y of query box
+     * @param width width of query box
+     * @param height height of query box
+     * @return a function that checks a widget
      */
     private Predicate<Widget> fallsWithinBounds(int x, int y, int width, int height) {
         return widget -> widget.x() >= x &&

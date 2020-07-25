@@ -46,24 +46,12 @@ public class WidgetController {
                 .body(service.listWidgets());
     }
 
-    // TODO using param for pagination
-//    @GetMapping("/widget")
-//    public List<Widget> getWidgets(@RequestParam(required = false) Integer from, @RequestParam(required = false, defaultValue = "500") int count) {
-//        // Require 5 tokens, making listing 5x more expensive than regular calls.
-//        // Potentially subjective interpretation of the spec
-//        RateLimitResponse rateLimitResponse = rateLimiter.request(LIST_WIDGET_MODIFIER);
-//        if(!rateLimitResponse.success()) {
-//            return new ResponseEntity(HttpStatus.TOO_MANY_REQUESTS);
-//        }
-//        return service.listWidgets();
-//    }
-
     @PostMapping("/widget")
     public ResponseEntity<Widget> insertWidget(@RequestBody Widget widget) {
         // TODO Any restrictions on widgets? Things like negative height / width? Weird time stamps?
         RateLimitResponse rateLimitResponse = rateLimiter.request(1);
         if (!rateLimitResponse.success()) {
-            return new ResponseEntity(HttpStatus.TOO_MANY_REQUESTS);
+            return new ResponseEntity<>(HttpStatus.TOO_MANY_REQUESTS);
         }
         Widget insertedWidget = service.insertWidget(widget);
         return ResponseEntity.status(HttpStatus.OK)
@@ -72,10 +60,10 @@ public class WidgetController {
     }
 
     @DeleteMapping("/widget/{id}")
-    public ResponseEntity deleteWidget(@PathVariable String id) {
+    public ResponseEntity<Widget> deleteWidget(@PathVariable String id) {
         RateLimitResponse rateLimitResponse = rateLimiter.request(1);
         if (!rateLimitResponse.success()) {
-            return new ResponseEntity(HttpStatus.TOO_MANY_REQUESTS);
+            return new ResponseEntity<>(HttpStatus.TOO_MANY_REQUESTS);
         }
         service.deleteWidget(id);
         return ResponseEntity.status(HttpStatus.OK)
@@ -97,8 +85,8 @@ public class WidgetController {
     /**
      * Convert the rateLimitResponse object from the ratelimiter to HTTP Headers
      *
-     * @param rateLimitReponse
-     * @return
+     * @param rateLimitReponse the rate response
+     * @return a set of headers
      */
     private HttpHeaders parseRateLimitHeaders(RateLimitResponse rateLimitReponse) {
         HttpHeaders httpHeaders = new HttpHeaders();

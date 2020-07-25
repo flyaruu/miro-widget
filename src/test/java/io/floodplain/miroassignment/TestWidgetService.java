@@ -50,11 +50,14 @@ public class TestWidgetService {
         assertEquals(insertedWidget, retrieved);
         // Test update. Update to new widget, retrieve and see if it stuck:
         Widget otherWidget = TestingUtilities.createRandomWidget();
-        widgetService.updateWidget(otherWidget.withId(insertedWidget.id()));
+        Widget copiedWidget = otherWidget.withId(insertedWidget.id());
+        Widget updatedWidget = widgetService.updateWidget(copiedWidget);
+        assertEquals(updatedWidget,copiedWidget);
         // And still should be only one
         assertEquals(1, widgetService.listWidgets().size());
         // Test delete and see that is empty now
-        widgetService.deleteWidget(insertedWidget.id());
+        boolean success = widgetService.deleteWidget(insertedWidget.id());
+        assertTrue(success,"Delete failed");
         assertNull(widgetService.getWidget(insertedWidget.id()));
         assertEquals(0, widgetService.listWidgets().size());
     }
@@ -81,9 +84,7 @@ public class TestWidgetService {
     @Test
     public void testPagination() {
         // add 501 items
-        IntStream.range(0, 501).forEach(i -> {
-            widgetService.insertWidget(TestingUtilities.createRandomWidget());
-        });
+        IntStream.range(0, 501).forEach(i -> widgetService.insertWidget(TestingUtilities.createRandomWidget()));
         // Sanitycheck, are there actually 501 items?
         assertEquals(501, widgetService.listWidgets().size());
 

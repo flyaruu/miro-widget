@@ -4,13 +4,13 @@ public interface RateLimiter {
     /**
      * Request a token @see RateLimitResponse for details
      *
-     * @return
+     * @return the response, either successful or unsuccessful
      */
-    public RateLimitResponse request(long numberOfTokens);
+    RateLimitResponse request(long numberOfTokens);
 
     /**
      * @param refillRate The number of available tokens per minute, as well as the initial number.
      *                   (Possible 'leak' if the client is able to change the mrpm thus resetting the available count)
      */
-    public void setMaxRequestsPerMinute(long refillRate);
+    void setMaxRequestsPerMinute(long refillRate);
 }
