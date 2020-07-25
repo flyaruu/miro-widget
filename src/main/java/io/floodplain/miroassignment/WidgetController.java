@@ -19,6 +19,7 @@ public class WidgetController {
     public static final int LIST_WIDGET_MODIFIER = 5;
     private final WidgetService service;
     private final RateLimiter rateLimiter;
+
     WidgetController(WidgetService service, RateLimiter rateLimiter) {
         this.service = service;
         this.rateLimiter = rateLimiter;
@@ -30,19 +31,19 @@ public class WidgetController {
         // Require 5 tokens, making listing 5x more expensive than regular calls.
         // Potentially subjective interpretation of the spec
         RateLimitResponse rateLimitResponse = rateLimiter.request(LIST_WIDGET_MODIFIER);
-        if(!rateLimitResponse.success()) {
+        if (!rateLimitResponse.success()) {
             return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).headers(parseRateLimitHeaders(rateLimitResponse)).build();
         }
 
         // 'From' is nullable, if present paginate, otherwise don't
-        if(from!=null) {
+        if (from != null) {
             return ResponseEntity.ok()
                     .headers(parseRateLimitHeaders(rateLimitResponse))
                     .body(service.listPaginated(from, Optional.ofNullable(count)));
         }
         return ResponseEntity.ok()
                 .headers(parseRateLimitHeaders(rateLimitResponse))
-            .body(service.listWidgets());
+                .body(service.listWidgets());
     }
 
     // TODO using param for pagination
@@ -61,7 +62,7 @@ public class WidgetController {
     public ResponseEntity<Widget> insertWidget(@RequestBody Widget widget) {
         // TODO Any restrictions on widgets? Things like negative height / width? Weird time stamps?
         RateLimitResponse rateLimitResponse = rateLimiter.request(1);
-        if(!rateLimitResponse.success()) {
+        if (!rateLimitResponse.success()) {
             return new ResponseEntity(HttpStatus.TOO_MANY_REQUESTS);
         }
         Widget insertedWidget = service.insertWidget(widget);
@@ -73,13 +74,13 @@ public class WidgetController {
     @DeleteMapping("/widget/{id}")
     public ResponseEntity deleteWidget(@PathVariable String id) {
         RateLimitResponse rateLimitResponse = rateLimiter.request(1);
-        if(!rateLimitResponse.success()) {
+        if (!rateLimitResponse.success()) {
             return new ResponseEntity(HttpStatus.TOO_MANY_REQUESTS);
         }
         service.deleteWidget(id);
         return ResponseEntity.status(HttpStatus.OK)
-            .headers(parseRateLimitHeaders(rateLimitResponse))
-            .build();
+                .headers(parseRateLimitHeaders(rateLimitResponse))
+                .build();
     }
 
     @PutMapping("/widget/{id}")
@@ -95,13 +96,14 @@ public class WidgetController {
 
     /**
      * Convert the rateLimitResponse object from the ratelimiter to HTTP Headers
+     *
      * @param rateLimitReponse
      * @return
      */
     private HttpHeaders parseRateLimitHeaders(RateLimitResponse rateLimitReponse) {
         HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.put("RateLimit-Remaining",List.of(Long.toString(rateLimitReponse.rateLimit())));
-        httpHeaders.put("RateLimit-Reset",List.of(Long.toString(rateLimitReponse.untilNextReset().toSeconds())));
+        httpHeaders.put("RateLimit-Remaining", List.of(Long.toString(rateLimitReponse.rateLimit())));
+        httpHeaders.put("RateLimit-Reset", List.of(Long.toString(rateLimitReponse.untilNextReset().toSeconds())));
         return httpHeaders;
     }
 

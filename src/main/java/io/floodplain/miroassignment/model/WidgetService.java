@@ -16,6 +16,7 @@ public interface WidgetService {
 
     /**
      * Inserts widgets with z coordinate at the level 0.
+     *
      * @param w Widget to insert
      * @return Created key
      */
@@ -23,6 +24,7 @@ public interface WidgetService {
 
     /**
      * Find a widget and return it
+     *
      * @param id the id
      * @return widget, or null if not found
      */
@@ -30,6 +32,7 @@ public interface WidgetService {
 
     /**
      * Delete a widget
+     *
      * @param id
      * @return true if found, false otherwise
      */
@@ -37,6 +40,7 @@ public interface WidgetService {
 
     /**
      * Replace a widget with the supplied widget
+     *
      * @param widget new widget. The widget should have an id pointing to an existing widget
      * @return the new updated widget.
      */
@@ -54,7 +58,8 @@ public interface WidgetService {
 
     /**
      * List widgets within the
-     * @param from start index
+     *
+     * @param from  start index
      * @param count optionally number of elements. If empty, default number of widgets will be returned (maxed by MAX_PAGINATION_COUNT)
      * @return the selected list
      */

@@ -21,6 +21,6 @@ public class TestingUtilities {
     }
 
     static Widget createTestWidget(int number) {
-        return new Widget(null,number,number,number,number,number,Instant.ofEpochSecond(number));
+        return new Widget(null, number, number, number, number, number, Instant.ofEpochSecond(number));
     }
 }

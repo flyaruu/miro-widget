@@ -8,13 +8,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 @SpringBootTest
 class MiroassignmentApplicationTests {
 
-	@Autowired
-	private WidgetService widgetService;
+    @Autowired
+    private WidgetService widgetService;
 
-	@Test
-	void contextLoads() {
-	}
-
+    @Test
+    void contextLoads() {
+    }
 
 
 }

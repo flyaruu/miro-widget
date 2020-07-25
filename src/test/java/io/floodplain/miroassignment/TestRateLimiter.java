@@ -23,7 +23,7 @@ public class TestRateLimiter {
     public void testSmallRateLimit() {
         rateLimiter.setMaxRequestsPerMinute(1);
         RateLimitResponse first = rateLimiter.request(1);
-        logger.info("First response: {}",first);
+        logger.info("First response: {}", first);
         Assertions.assertTrue(first.success());
         RateLimitResponse second = rateLimiter.request(1);
         Assertions.assertFalse(second.success());
@@ -34,12 +34,12 @@ public class TestRateLimiter {
         // start small
         rateLimiter.setMaxRequestsPerMinute(1);
         RateLimitResponse first = rateLimiter.request(1);
-        logger.info("First response: {}",first);
+        logger.info("First response: {}", first);
         Assertions.assertTrue(first.success());
         rateLimiter.setMaxRequestsPerMinute(10);
-        IntStream.rangeClosed(1,10).forEach(i->{
+        IntStream.rangeClosed(1, 10).forEach(i -> {
             RateLimitResponse response = rateLimiter.request(1);
-            logger.info("response: {} {}",i,response);
+            logger.info("response: {} {}", i, response);
             Assertions.assertTrue(response.success());
         });
         RateLimitResponse last = rateLimiter.request(1);

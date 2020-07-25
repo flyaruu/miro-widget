@@ -68,20 +68,20 @@ public class TestWidgetService {
         assertEquals(firstWidget, list.get(0));
         assertEquals(secondWidget, list.get(1));
         // assert unchanged z:
-        assertEquals(10,firstWidget.z());
-        assertEquals(11,secondWidget.z());
+        assertEquals(10, firstWidget.z());
+        assertEquals(11, secondWidget.z());
 
         Widget thirdWidget = widgetService.insertWidget(TestingUtilities.createTestWidget(3).withZIndex(10));
         // add another at z=10. First should be at eleven now, second at twelve
-        assertEquals(10,thirdWidget.z());
-        assertEquals(11,widgetService.getWidget(firstWidget.id()).z());
-        assertEquals(12,widgetService.getWidget(secondWidget.id()).z());
+        assertEquals(10, thirdWidget.z());
+        assertEquals(11, widgetService.getWidget(firstWidget.id()).z());
+        assertEquals(12, widgetService.getWidget(secondWidget.id()).z());
     }
 
     @Test
     public void testPagination() {
         // add 501 items
-        IntStream.range(0,501).forEach(i->{
+        IntStream.range(0, 501).forEach(i -> {
             widgetService.insertWidget(TestingUtilities.createRandomWidget());
         });
         // Sanitycheck, are there actually 501 items?
@@ -89,17 +89,17 @@ public class TestWidgetService {
 
 
         List<Widget> paginatedFromZero = widgetService.listPaginated(0, Optional.of(3));
-        List<Widget> paginatedFromOne = widgetService.listPaginated(1,Optional.of(3));
-        assertEquals(3,paginatedFromZero.size());
-        assertEquals(3,paginatedFromOne.size());
+        List<Widget> paginatedFromOne = widgetService.listPaginated(1, Optional.of(3));
+        assertEquals(3, paginatedFromZero.size());
+        assertEquals(3, paginatedFromOne.size());
         // Check if they are actually shifted by one
-        assertEquals(paginatedFromOne.get(0),paginatedFromZero.get(1));
+        assertEquals(paginatedFromOne.get(0), paginatedFromZero.get(1));
 
         // Test default page size:
-        assertEquals(10,widgetService.listPaginated(0,Optional.empty()).size());
+        assertEquals(10, widgetService.listPaginated(0, Optional.empty()).size());
 
         // test that default max is observed:
-        assertEquals(500,widgetService.listPaginated(0,Optional.of(Integer.MAX_VALUE)).size());
+        assertEquals(500, widgetService.listPaginated(0, Optional.of(Integer.MAX_VALUE)).size());
 
     }
 

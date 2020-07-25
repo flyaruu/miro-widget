@@ -43,7 +43,7 @@ public class WidgetIntegrationTest {
     public void testWidgetCRUD() throws Exception {
 
         // List widgets, should be zero
-        assertEquals (0, listWidgets().size());
+        assertEquals(0, listWidgets().size());
 
         // Add a widget
         Widget w = TestingUtilities.createRandomWidget();
@@ -52,27 +52,27 @@ public class WidgetIntegrationTest {
                 .content(objectMapper.writeValueAsString(w)))
                 .andExpect(status().isOk())
                 .andReturn();
-        Widget insertedWidget = objectMapper.readValue(insertResult.getResponse().getContentAsByteArray(),Widget.class);
+        Widget insertedWidget = objectMapper.readValue(insertResult.getResponse().getContentAsByteArray(), Widget.class);
 
         String id = insertedWidget.id();
-        logger.info("Detected id: {}",id);
+        logger.info("Detected id: {}", id);
 
         // Query widget again, should be identical to original
         MvcResult queryResult = mockMvc.perform(get("/widget/{id}", id)
                 .contentType("application/json"))
                 .andExpect(status().isOk())
                 .andReturn();
-        Widget reQueried = objectMapper.readValue(queryResult.getResponse().getContentAsByteArray(),Widget.class);
-        assertEquals(insertedWidget,reQueried);
+        Widget reQueried = objectMapper.readValue(queryResult.getResponse().getContentAsByteArray(), Widget.class);
+        assertEquals(insertedWidget, reQueried);
 
         // List widgets, should contain one widget now
-        assertEquals (1, listWidgets().size());
+        assertEquals(1, listWidgets().size());
 
-        mockMvc.perform(delete("/widget/{id}",id))
+        mockMvc.perform(delete("/widget/{id}", id))
                 .andExpect(status().isOk());
 
         // deleted, should be empty again
-        assertEquals (0, listWidgets().size());
+        assertEquals(0, listWidgets().size());
 
     }
 
@@ -80,7 +80,7 @@ public class WidgetIntegrationTest {
     public void testActualRateLimiting() throws Exception {
         // start with 10 tokens, good for two lists, (every list query uses up 5 tokens)
         rateLimiter.setMaxRequestsPerMinute(10);
-        for (int i=0; i < 2; i++) {
+        for (int i = 0; i < 2; i++) {
             mockMvc.perform(get("/widget"))
                     .andExpect(status().isOk());
         }
@@ -107,7 +107,8 @@ public class WidgetIntegrationTest {
         byte[] listResponse = mockMvc.perform(get("/widget"))
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsByteArray();
-        return objectMapper.readValue(listResponse, new TypeReference<List<Widget>>(){});
+        return objectMapper.readValue(listResponse, new TypeReference<List<Widget>>() {
+        });
     }
 
 //    private boolean widgetAttributesEqual(Widget first, Widget second) {

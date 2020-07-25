@@ -20,20 +20,20 @@ public class TestGeoIndex {
 
     @Test
     public void testEasyWithGaps() {
-        widgetService.insertWidget(Widget.create(10,10,10,10,10));
-        widgetService.insertWidget(Widget.create(30,10,10,10,10));
-        widgetService.insertWidget(Widget.create(50,10,10,10,10));
+        widgetService.insertWidget(Widget.create(10, 10, 10, 10, 10));
+        widgetService.insertWidget(Widget.create(30, 10, 10, 10, 10));
+        widgetService.insertWidget(Widget.create(50, 10, 10, 10, 10));
 
         // Test with margins
-        Assertions.assertEquals(3,widgetService.listFiltered(0,0,70,20).size());
+        Assertions.assertEquals(3, widgetService.listFiltered(0, 0, 70, 20).size());
         // Test tight box
-        Assertions.assertEquals(3,widgetService.listFiltered(10,10,60,20).size());
+        Assertions.assertEquals(3, widgetService.listFiltered(10, 10, 60, 20).size());
         // Test cut off
-        Assertions.assertEquals(2,widgetService.listFiltered(10,10,55,20).size());
+        Assertions.assertEquals(2, widgetService.listFiltered(10, 10, 55, 20).size());
 
-        widgetService.insertWidget(Widget.create(15,10,10,10,10));
+        widgetService.insertWidget(Widget.create(15, 10, 10, 10, 10));
         // test overlap
-        Assertions.assertEquals(4,widgetService.listFiltered(10,10,60,20).size());
+        Assertions.assertEquals(4, widgetService.listFiltered(10, 10, 60, 20).size());
 
     }
 
