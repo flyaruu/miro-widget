@@ -13,7 +13,7 @@ It was unclear to me if the last_updated flag needed to be updated by the backen
 ### CI
 The build test runs here: 
 
-[![CircleCI](https://circleci.com/gh/flyaruu/miro-widget.svg?style=svg)](https://circleci.com/gh/circleci/circleci-docs)
+[![CircleCI](https://circleci.com/gh/flyaruu/miro-widget.svg?style=svg)](https://circleci.com/gh/flyaruu/miro-widget)
 
 
 ### Dependencies
